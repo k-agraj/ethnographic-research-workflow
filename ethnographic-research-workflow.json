@@ -1,0 +1,647 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "format": "resolved",
+        "options": {}
+      },
+      "id": "0c953b54-70c4-456b-9fc6-d7dcdff98a24",
+      "name": "📧 Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [
+        -832,
+        3184
+      ],
+      "credentials": {
+        "imap": {
+          "id": "YOUR_IMAP_CREDENTIAL_ID",
+          "name": "IMAP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.subject }}",
+              "rightValue": "Ethnographic Research",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "id": "47073882-7fec-4f48-b151-dd613eb95004"
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "1f9296ce-dd3d-42b2-970a-1ac8776e1576",
+      "name": "🔍 Filter: Check Subject Keyword",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [
+        -608,
+        3184
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "88193bc0-1d2f-441c-aa8c-d57c0c80680a",
+              "leftValue": "={{ Object.keys($binary).length > 0 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "45283e59-cb0d-4e1f-b5c0-ce2825c8dc4d",
+      "name": "📎 Check: Has Attachments?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        3184
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $binary['attachment_0'].mimeType }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "0579cfe6-6d3a-4a00-bfd8-a6ff9b069524"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $binary['attachment_0'].mimeType }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "8dbbfdcb-15d9-45f8-9206-0ea9e12d0961"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $binary['attachment_0'].mimeType }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "fb9b7e7e-e528-4731-98dc-1435e96b17b3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "85d90e27-2545-4413-8312-87d2c69adec1",
+      "name": "🎬 Detect File Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -160,
+        2848
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $binary['attachment_0'];\nreturn [{ json: { fileName: b.fileName, mimeType: b.mimeType, senderEmail: $json.from, emailSubject: $json.subject, fileType: 'video', prompt: 'Please transcribe the following video file accurately and completely. Return only the transcript text.' }, binary: { data: b } }];"
+      },
+      "id": "e1684a13-d24a-4113-b367-45bc7f97c5f3",
+      "name": "🎞️ Prepare Video File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        2960
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $binary['attachment_0'];\nreturn [{ json: { fileName: b.fileName, mimeType: b.mimeType, senderEmail: $json.from, emailSubject: $json.subject, fileType: 'audio', prompt: 'Please transcribe the following audio file accurately and completely. Return only the transcript text.' }, binary: { data: b } }];"
+      },
+      "id": "8d7566ee-a3c6-45d9-a358-b93b8fb47973",
+      "name": "🎵 Prepare Audio File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        3264
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $binary['attachment_0'];\nconst transcriptText = b?.data ? Buffer.from(b.data, 'base64').toString('utf-8') : '';\nreturn [{ json: { fileName: b.fileName, senderEmail: $json.from, emailSubject: $json.subject, transcript: transcriptText, fileType: 'text', transcriptionSource: 'direct' } }];"
+      },
+      "id": "78d5f8d1-8600-438b-ad62-822e868ee1c9",
+      "name": "📄 Prepare Text Transcript",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        2512
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}"
+      },
+      "id": "bbd4b826-6974-48e9-9a58-1f81a27de1df",
+      "name": "⛓️ Transcribe Video Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        288,
+        2864
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "ea0232e4-ac5e-46a3-9b2c-b5d4436e90c5",
+      "name": "🤖 Gemini: Transcribe Video",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        352,
+        3088
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}"
+      },
+      "id": "95158a29-4f52-4b93-bc4a-cd6546befbf4",
+      "name": "⛓️ Transcribe Audio Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        288,
+        3264
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "b2042135-fefd-4111-ab07-83fc8c915f7b",
+      "name": "🤖 Gemini: Transcribe Audio",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        368,
+        3488
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const transcript = $json.text || $json.response || $json.content || '';\nconst prev = $('🎞️ Prepare Video File').first().json;\nreturn [{ json: { ...prev, transcript, transcriptionSource: 'gemini' } }];"
+      },
+      "id": "3e31e6d6-530b-4b48-8431-f15fb3d55abd",
+      "name": "🔗 Merge Video Transcript",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        2864
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const transcript = $json.text || $json.response || $json.content || '';\nconst prev = $('🎵 Prepare Audio File').first().json;\nreturn [{ json: { ...prev, transcript, transcriptionSource: 'gemini' } }];"
+      },
+      "id": "5cac13d9-734f-416f-957b-d8e70422a5f4",
+      "name": "🔗 Merge Audio Transcript",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        3264
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert qualitative researcher. Analyze the following interview transcript using ethnographic research methods.\n\nTranscript:\n{{ $json.transcript }}\n\nProvide a structured ethnographic analysis including:\n## 1. Executive Summary\n## 2. Key Themes & Patterns\n## 3. Participant Behaviors & Observations\n## 4. Cultural Insights\n## 5. Notable Quotes\n## 6. Recommendations\n\nBe thorough, analytical, and use academic ethnographic framing."
+      },
+      "id": "2ff08dc6-a486-4154-9cca-692698505044",
+      "name": "⛓️ Ethnographic Analysis Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        864,
+        2864
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {
+          "maxOutputTokens": 8192,
+          "temperature": 0.3
+        }
+      },
+      "id": "a244e522-6eb6-436d-9988-0413df18587f",
+      "name": "🔬 Gemini: Ethnographic Analysis",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        944,
+        3088
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const analysis = $json.text || $json.response || $json.content || '';\nconst senderEmail = $json.senderEmail || 'unknown';\nconst fileName = $json.fileName || 'interview';\nconst today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });\n\nfunction mdToRtf(text) {\n  return text\n    .replace(/^## (.+)$/gm, '{\\\\pard\\\\sb300\\\\b\\\\fs28 $1\\\\b0\\\\par}')\n    .replace(/^### (.+)$/gm, '{\\\\pard\\\\sb200\\\\b\\\\fs24 $1\\\\b0\\\\par}')\n    .replace(/\\*\\*(.+?)\\*\\*/g, '{\\\\b $1\\\\b0}')\n    .replace(/^- (.+)$/gm, '{\\\\pard\\\\li720\\\\bullet  $1\\\\par}')\n    .replace(/^(?!\\{\\\\pard)(.+)$/gm, '{\\\\pard $1\\\\par}')\n    .replace(/^\\s*$/gm, '{\\\\pard\\\\par}');\n}\n\nconst safeFileName = fileName.replace(/[{}\\\\]/g, '');\nconst rtfBody = mdToRtf(analysis);\n\nconst rtfContent = `{\\\\rtf1\\\\ansi\\\\deff0\\n{\\\\fonttbl{\\\\f0\\\\froman\\\\fcharset0 Times New Roman;}{\\\\f1\\\\fswiss\\\\fcharset0 Arial;}}\\n{\\\\colortbl ;\\\\red0\\\\green105\\\\blue111;\\\\red100\\\\green100\\\\blue100;}\\n\\\\widowctrl\\\\hyphauto\\n{\\\\pard\\\\qc\\\\cf1\\\\f1\\\\fs40\\\\b ETHNOGRAPHIC RESEARCH REPORT\\\\b0\\\\par}\\n{\\\\pard\\\\qc\\\\cf2\\\\f1\\\\fs20 AI-Powered Qualitative Analysis | ${today}\\\\par}\\n{\\\\pard\\\\qc\\\\cf2\\\\f1\\\\fs20 Source: ${safeFileName}\\\\par}\\n{\\\\pard\\\\par}\\n\\\\f0\\\\fs22\\n${rtfBody}\\n{\\\\pard\\\\par}\\n{\\\\pard\\\\f1\\\\fs16\\\\cf2 End of Report | Powered by Google Gemini via n8n Automation\\\\par}\\n}`;\n\nconst base64Rtf = Buffer.from(rtfContent, 'utf-8').toString('base64');\nconst outputFileName = `Ethnographic_Report_${fileName.replace(/\\.[^.]+$/, '').replace(/\\s+/g, '_')}_${Date.now()}.rtf`;\n\nreturn [{\n  json: { senderEmail, fileName, outputFileName, today },\n  binary: {\n    rtfFile: {\n      data: base64Rtf,\n      mimeType: 'application/rtf',\n      fileName: outputFileName,\n      fileExtension: 'rtf'\n    }\n  }\n}];"
+      },
+      "id": "fbe5ab0e-988c-4053-8d23-9364f16ba671",
+      "name": "📝 Create RTF Report File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        2864
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "YOUR_SENDER_EMAIL",
+        "toEmail": "={{ $('📧 Email Trigger (IMAP)').item.json.headers['return-path'] }}",
+        "subject": "=Re:{{ $('📧 Email Trigger (IMAP)').item.json.headers.subject.replace(/^Subject:\\s*/i, '').trim() }}",
+        "text": "=Thank you for submitting your research file. Your ethnographic analysis report is ready and attached to this email.\n\nReport Details:\n• Source File: {{ $json.fileName }}\n• Generated On: {{ $json.today }}\n• Analysis Type: AI-Powered Ethnographic Research\n\nThe attached RTF file includes an executive summary, key themes and patterns, participant behaviors, cultural insights, notable quotes, and actionable recommendations.\n\nPlease open the attached file {{ $('📄 Prepare Text Transcript').item.json.fileName }} to review your full report.\n\nIf you have any questions or would like to submit another file for analysis, simply send a new email with the subject \"Perform Ethnographic Research\" and attach your video, audio, or text file.\n\nBest regards,\nEthnographic Research Automation\nYOUR_SENDER_EMAIL",
+        "options": {
+          "attachments": "rtfFile"
+        }
+      },
+      "id": "0f5d1f65-82fc-4dfd-a417-4b98e58a1a44",
+      "name": "📤 Send Email with RTF Report",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        3184
+      ],
+      "webhookId": "YOUR_WEBHOOK_ID",
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { error: 'No attachment found. Please attach a video, audio, or text transcript file.', timestamp: new Date().toISOString() } }];"
+      },
+      "id": "952da936-0ff2-48e2-b035-63c9396aae8e",
+      "name": "⚠️ No Attachment Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        3696
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "YOUR_SENDER_EMAIL",
+        "toEmail": "={{ $('📧 Email Trigger (IMAP)').item.json.headers['return-path'] }}",
+        "subject": "=Re:{{ $('📧 Email Trigger (IMAP)').item.json.headers.subject.replace(/^Subject:\\s*/i, '').trim() }}",
+        "text": "={{ $json.error }}",
+        "options": {}
+      },
+      "id": "35fa540e-2cd0-457f-95ab-0cfcc5f6b258",
+      "name": "📤 Send Email with Error",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        592,
+        3696
+      ],
+      "webhookId": "YOUR_WEBHOOK_ID",
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "📧 Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "🔍 Filter: Check Subject Keyword",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔍 Filter: Check Subject Keyword": {
+      "main": [
+        [
+          {
+            "node": "📎 Check: Has Attachments?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📎 Check: Has Attachments?": {
+      "main": [
+        [
+          {
+            "node": "🎬 Detect File Type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "⚠️ No Attachment Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎬 Detect File Type": {
+      "main": [
+        [
+          {
+            "node": "📄 Prepare Text Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "🎞️ Prepare Video File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "🎵 Prepare Audio File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎞️ Prepare Video File": {
+      "main": [
+        [
+          {
+            "node": "⛓️ Transcribe Video Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎵 Prepare Audio File": {
+      "main": [
+        [
+          {
+            "node": "⛓️ Transcribe Audio Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📄 Prepare Text Transcript": {
+      "main": [
+        [
+          {
+            "node": "⛓️ Ethnographic Analysis Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⛓️ Transcribe Video Chain": {
+      "main": [
+        [
+          {
+            "node": "🔗 Merge Video Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Gemini: Transcribe Video": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "⛓️ Transcribe Video Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⛓️ Transcribe Audio Chain": {
+      "main": [
+        [
+          {
+            "node": "🔗 Merge Audio Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Gemini: Transcribe Audio": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "⛓️ Transcribe Audio Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔗 Merge Video Transcript": {
+      "main": [
+        [
+          {
+            "node": "⛓️ Ethnographic Analysis Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔗 Merge Audio Transcript": {
+      "main": [
+        [
+          {
+            "node": "⛓️ Ethnographic Analysis Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⛓️ Ethnographic Analysis Chain": {
+      "main": [
+        [
+          {
+            "node": "📝 Create RTF Report File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔬 Gemini: Ethnographic Analysis": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "⛓️ Ethnographic Analysis Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📝 Create RTF Report File": {
+      "main": [
+        [
+          {
+            "node": "📤 Send Email with RTF Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚠️ No Attachment Error": {
+      "main": [
+        [
+          {
+            "node": "📤 Send Email with Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "YOUR_N8N_INSTANCE_ID"
+  }
+}
