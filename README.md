@@ -110,15 +110,18 @@ The generated RTF report contains six sections:
 
 ### Credentials
 
-Open the workflow in n8n and configure the following credentials:
+A `.env` file is included locally (gitignored — never pushed) that holds the real values for every placeholder in the JSON. The mapping is:
 
-| Credential | Used by |
-|---|---|
-| IMAP account | 📧 Email Trigger (IMAP) |
-| Google Gemini(PaLM) API | 🤖 Gemini nodes (×3) |
-| SMTP account | 📤 Send Email nodes (×2) |
+| `.env` variable | Placeholder in JSON | Used by |
+|---|---|---|
+| `N8N_IMAP_CREDENTIAL_ID` | `${N8N_IMAP_CREDENTIAL_ID}` | 📧 Email Trigger (IMAP) |
+| `N8N_GOOGLE_GEMINI_CREDENTIAL_ID` | `${N8N_GOOGLE_GEMINI_CREDENTIAL_ID}` | 🤖 Gemini nodes (×3) |
+| `N8N_SMTP_CREDENTIAL_ID` | `${N8N_SMTP_CREDENTIAL_ID}` | 📤 Send Email nodes (×2) |
+| `N8N_SENDER_EMAIL` | `${N8N_SENDER_EMAIL}` | 📤 Send Email nodes (×2) |
+| `N8N_WEBHOOK_ID` | `${N8N_WEBHOOK_ID}` | 📤 Send Email nodes (×2) |
+| `N8N_INSTANCE_ID` | `${N8N_INSTANCE_ID}` | `meta` section |
 
-Update the `fromEmail` field in both **Send Email** nodes to your sender address.
+To use the workflow on a new machine, copy `.env.example` (or recreate `.env`) with your own n8n credential IDs, then substitute the values into the JSON before importing.
 
 ### Importing the Workflow
 

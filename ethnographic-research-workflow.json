@@ -15,7 +15,7 @@
       ],
       "credentials": {
         "imap": {
-          "id": "YOUR_IMAP_CREDENTIAL_ID",
+          "id": "${N8N_IMAP_CREDENTIAL_ID}",
           "name": "IMAP account"
         }
       }
@@ -248,7 +248,7 @@
       ],
       "credentials": {
         "googlePalmApi": {
-          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "id": "${N8N_GOOGLE_GEMINI_CREDENTIAL_ID}",
           "name": "Google Gemini(PaLM) Api account"
         }
       }
@@ -284,7 +284,7 @@
       ],
       "credentials": {
         "googlePalmApi": {
-          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "id": "${N8N_GOOGLE_GEMINI_CREDENTIAL_ID}",
           "name": "Google Gemini(PaLM) Api account"
         }
       }
@@ -347,7 +347,7 @@
       ],
       "credentials": {
         "googlePalmApi": {
-          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "id": "${N8N_GOOGLE_GEMINI_CREDENTIAL_ID}",
           "name": "Google Gemini(PaLM) Api account"
         }
       }
@@ -367,10 +367,10 @@
     },
     {
       "parameters": {
-        "fromEmail": "YOUR_SENDER_EMAIL",
+        "fromEmail": "${N8N_SENDER_EMAIL}",
         "toEmail": "={{ $('📧 Email Trigger (IMAP)').item.json.headers['return-path'] }}",
         "subject": "=Re:{{ $('📧 Email Trigger (IMAP)').item.json.headers.subject.replace(/^Subject:\\s*/i, '').trim() }}",
-        "text": "=Thank you for submitting your research file. Your ethnographic analysis report is ready and attached to this email.\n\nReport Details:\n• Source File: {{ $json.fileName }}\n• Generated On: {{ $json.today }}\n• Analysis Type: AI-Powered Ethnographic Research\n\nThe attached RTF file includes an executive summary, key themes and patterns, participant behaviors, cultural insights, notable quotes, and actionable recommendations.\n\nPlease open the attached file {{ $('📄 Prepare Text Transcript').item.json.fileName }} to review your full report.\n\nIf you have any questions or would like to submit another file for analysis, simply send a new email with the subject \"Perform Ethnographic Research\" and attach your video, audio, or text file.\n\nBest regards,\nEthnographic Research Automation\nYOUR_SENDER_EMAIL",
+        "text": "=Thank you for submitting your research file. Your ethnographic analysis report is ready and attached to this email.\n\nReport Details:\n• Source File: {{ $json.fileName }}\n• Generated On: {{ $json.today }}\n• Analysis Type: AI-Powered Ethnographic Research\n\nThe attached RTF file includes an executive summary, key themes and patterns, participant behaviors, cultural insights, notable quotes, and actionable recommendations.\n\nPlease open the attached file {{ $('📄 Prepare Text Transcript').item.json.fileName }} to review your full report.\n\nIf you have any questions or would like to submit another file for analysis, simply send a new email with the subject \"Perform Ethnographic Research\" and attach your video, audio, or text file.\n\nBest regards,\nEthnographic Research Automation\n${N8N_SENDER_EMAIL}",
         "options": {
           "attachments": "rtfFile"
         }
@@ -383,10 +383,10 @@
         1440,
         3184
       ],
-      "webhookId": "YOUR_WEBHOOK_ID",
+      "webhookId": "${N8N_WEBHOOK_ID}",
       "credentials": {
         "smtp": {
-          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "id": "${N8N_SMTP_CREDENTIAL_ID}",
           "name": "SMTP account"
         }
       }
@@ -406,7 +406,7 @@
     },
     {
       "parameters": {
-        "fromEmail": "YOUR_SENDER_EMAIL",
+        "fromEmail": "${N8N_SENDER_EMAIL}",
         "toEmail": "={{ $('📧 Email Trigger (IMAP)').item.json.headers['return-path'] }}",
         "subject": "=Re:{{ $('📧 Email Trigger (IMAP)').item.json.headers.subject.replace(/^Subject:\\s*/i, '').trim() }}",
         "text": "={{ $json.error }}",
@@ -420,10 +420,10 @@
         592,
         3696
       ],
-      "webhookId": "YOUR_WEBHOOK_ID",
+      "webhookId": "${N8N_WEBHOOK_ID}",
       "credentials": {
         "smtp": {
-          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "id": "${N8N_SMTP_CREDENTIAL_ID}",
           "name": "SMTP account"
         }
       }
@@ -642,6 +642,6 @@
   "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "YOUR_N8N_INSTANCE_ID"
+    "instanceId": "${N8N_INSTANCE_ID}"
   }
 }
